@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Landscapes of History</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+<div id="sidebar">
+
+    <img
+        src="images/logo.png"
+        id="logo"
+        alt="Landscapes of History">
+
+    <p id="tagline">
+
+        Explore Britain's historic landscapes,
+        structures and forgotten places.
+
+    </p>
+
+    <h2>Search</h2>
+
+    <div id="searchBar">
+
+        <input
+            type="text"
+            id="searchInput"
+            placeholder="Search by town...">
+
+        <button id="searchButton">
+            Search
+        </button>
+
+    </div>
+
+    <h2>Projects</h2>
+
+    <div id="projects">
+
+    <div class="projectCard active" id="martelloCard">
+
+    <h3>🏰 Martello Towers</h3>
+
+    <p>Historic coastal forts</p>
+
+</div>
+
+    <div class="projectCard">
+
+    <h3>💧 Water Towers</h3>
+
+    <p>Historic water infrastructure</p>
+
+</div>
+
+<div class="projectCard">
+
+    <h3>⚔ Battlefields</h3>
+
+    <p>Historic sites of conflict</p>
+
+</div>
+
+</div>
+
+</div>
+
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="script.js"></script>
+
+</body>
+
+</html>

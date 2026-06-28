@@ -1,0 +1,367 @@
+/* ==========================================
+   Landscapes of History
+   Main Stylesheet
+========================================== */
+
+/* ---------- Colours ---------- */
+
+:root{
+
+    --accent:#BFE265;
+    --charcoal:#333333;
+    --grey:#6B6A6A;
+    --lightgrey:#ADADAD;
+    --white:#FFFFFF;
+
+}
+
+
+/* ---------- Page ---------- */
+
+html,
+body{
+
+    margin:0;
+    padding:0;
+    height:100%;
+
+    font-family:"Century Gothic", sans-serif;
+
+    background:var(--white);
+
+    color:var(--charcoal);
+
+}
+
+body{
+
+    display:flex;
+
+}
+
+
+/* ---------- Sidebar ---------- */
+
+#sidebar{
+
+    width:360px;
+
+    background:var(--charcoal);
+
+    color:var(--white);
+
+    border-right:none;
+
+    padding:35px;
+
+    box-sizing:border-box;
+
+    overflow-y:auto;
+
+}
+
+/* ---------- Logo ---------- */
+
+#logo{
+
+    width:230px;
+
+    display:block;
+
+    margin:0 auto 25px;
+
+}
+
+
+/* ---------- Typography ---------- */
+
+h1{
+
+    font-size:42px;
+
+    font-weight:bold;
+
+}
+
+h2{
+
+    font-size:30px;
+
+    margin-top:35px;
+
+    margin-bottom:15px;
+
+}
+
+h3{
+
+    font-size:22px;
+
+}
+
+/* ---------- Sidebar Headings ---------- */
+
+#sidebar h2{
+
+    color:var(--white);
+
+}
+
+
+/* ---------- Tagline ---------- */
+
+#tagline{
+
+    color:var(--lightgrey);
+
+    text-align:center;
+
+    margin-bottom:35px;
+
+    line-height:1.6;
+
+}
+
+
+/* ---------- Search ---------- */
+
+#searchBar{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:12px;
+
+    margin-bottom:35px;
+
+}
+
+
+#searchInput{
+
+    padding:12px;
+
+    font-size:16px;
+
+    border:1px solid var(--lightgrey);
+
+    border-radius:8px;
+
+    font-family:inherit;
+
+    outline:none;
+
+}
+
+
+#searchInput:focus{
+
+    border-color:var(--accent);
+
+}
+
+
+#searchButton{
+
+    background:var(--accent);
+
+    color:var(--charcoal);
+
+    border:none;
+
+    border-radius:8px;
+
+    padding:12px;
+
+    cursor:pointer;
+
+    font-size:16px;
+
+    font-family:inherit;
+
+    transition:all .2s ease;
+
+}
+
+
+#searchButton:hover{
+
+    transform:translateY(-2px);
+
+    filter:brightness(95%);
+
+}
+
+
+/* ---------- Search Results ---------- */
+
+#searchResults{
+
+    margin-top:15px;
+
+}
+
+
+.searchResult{
+
+    background:var(--white);
+
+    border:1px solid var(--lightgrey);
+
+    border-radius:8px;
+
+    padding:12px;
+
+    margin-bottom:8px;
+
+    cursor:pointer;
+
+    transition:0.2s;
+
+}
+
+
+.searchResult:hover{
+
+    background:#f7f7f7;
+
+}
+
+
+.searchTitle{
+
+    font-weight:bold;
+
+}
+
+
+.searchTown{
+
+    color:var(--grey);
+
+    font-size:14px;
+
+}
+
+
+/* ---------- Layer Control ---------- */
+
+.leaflet-control-layers{
+
+    border:none !important;
+
+    box-shadow:none !important;
+
+    background:transparent !important;
+
+    margin:0 !important;
+
+}
+
+
+.leaflet-control-layers-toggle{
+
+    display:none;
+
+}
+
+
+/* ---------- Map ---------- */
+
+#map{
+
+    flex:1;
+
+    height:100vh;
+
+}
+
+
+/* ---------- Leaflet ---------- */
+
+.leaflet-popup-content{
+
+    font-family:"Century Gothic", sans-serif;
+
+}
+
+.leaflet-control-zoom a{
+
+    color:var(--charcoal);
+
+}
+
+/* ---------- Text Selection ---------- */
+
+::selection{
+
+    background:var(--accent);
+
+    color:var(--charcoal);
+
+}
+
+/* ---------- Projects ---------- */
+
+#projects{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:12px;
+
+}
+
+.projectCard{
+
+    background:#444444;
+
+    border-left:4px solid transparent;
+
+    border-radius:10px;
+
+    padding:18px;
+
+    cursor:pointer;
+
+    transition:all .2s ease;
+
+}
+
+.projectCard:hover{
+
+    transform:translateY(-2px);
+
+    border-left-color:var(--accent);
+
+    background:#4A4A4A;
+
+}
+
+.projectCard h3{
+
+    margin:0 0 8px 0;
+
+    color:var(--white);
+
+    font-size:18px;
+
+}
+
+.projectCard p{
+
+    margin:0;
+
+    color:var(--lightgrey);
+
+    font-size:14px;
+
+}
+
+.projectCard.active{
+
+    border-left:4px solid var(--accent);
+
+}
