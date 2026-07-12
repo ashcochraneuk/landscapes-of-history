@@ -10,9 +10,41 @@
 
 const map = L.map("map").setView([52.5, -1.5], 6);
 
-L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    attribution: '&copy; OpenStreetMap contributors'
+const lohBasemap = L.tileLayer("basemap_tiles/{z}/{x}/{y}.png", {
+    minZoom: 6,
+    maxNativeZoom: 10,
+    maxZoom: 18,
+    attribution: "Landscapes of History"
 }).addTo(map);
+
+const osmBasemap = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19,
+    attribution: '&copy; OpenStreetMap contributors'
+});
+
+
+
+
+// -------------------------------------------------
+// Map Style Switcher
+// -------------------------------------------------
+
+document.querySelectorAll('input[name="mapStyle"]').forEach(option => {
+
+    option.addEventListener("change", function() {
+
+        map.removeLayer(lohBasemap);
+        map.removeLayer(osmBasemap);
+
+        if (this.value === "osm") {
+            osmBasemap.addTo(map);
+        } else {
+            lohBasemap.addTo(map);
+        }
+
+    });
+
+});
 
 
 // -------------------------------------------------

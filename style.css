@@ -302,6 +302,34 @@ h3{
 
 }
 
+
+/* ---------- Map Styles ---------- */
+
+#mapStyles{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    margin-bottom:35px;
+}
+
+.mapStyleOption{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    cursor:pointer;
+    color:var(--lightgrey);
+    font-size:15px;
+}
+
+.mapStyleOption input{
+    accent-color:var(--accent);
+    cursor:pointer;
+}
+
+.mapStyleOption:has(input:checked){
+    color:var(--white);
+}
+
 /* ---------- Projects ---------- */
 
 #projects{
