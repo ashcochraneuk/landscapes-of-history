@@ -1,6 +1,27 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Landscapes of History</title><link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"><link rel="stylesheet" href="style.css"></head><body>
 <aside id="sidebar"><img src="images/logo_transparent_cropped.png" id="logo" alt="Landscapes of History"><p id="tagline">Explore Britain's historic landscapes, structures and forgotten places.</p>
-<section><h2>Search</h2><div id="searchBar"><input id="searchInput" placeholder="Search place, county or site..." autocomplete="off"><button id="searchButton">Search</button></div><div id="searchSummary"></div><div id="searchResults"></div></section>
-<section><h2>Map Style</h2><div id="mapStyles"><label><input type="radio" name="mapStyle" value="loh" checked> Landscapes of History</label><label><input type="radio" name="mapStyle" value="osm"> OpenStreetMap</label></div></section>
+<section><h2>Search</h2><div id="searchBar"><input id="searchInput" placeholder="Search place, county or site..." autocomplete="off"><button id="searchButton">Search</button></div><div id="searchSummary"></div>
+<div id="searchTabs"></div>
+<div id="searchResults"></div>
+<section>
+    <h2>Map Style</h2>
+
+    <div id="mapStyles">
+        <label>
+            <input type="radio" name="mapStyle" value="loh" checked>
+            Landscapes of History
+        </label>
+
+        <label>
+            <input type="radio" name="mapStyle" value="osm">
+            OpenStreetMap
+        </label>
+
+        <label>
+            <input type="radio" name="mapStyle" value="satellite">
+            Satellite
+        </label>
+    </div>
+</section>
 <section><h2>Projects</h2><div id="projects"><button class="projectCard" data-project="martello"><img src="icons/martellotowers.png" alt=""><span>Martello Towers</span></button><button class="projectCard" data-project="water"><img src="icons/watertower.png" alt=""><span>Water Towers</span></button><button class="projectCard" data-project="battlefield"><img src="icons/Battlefields.png" alt=""><span>Battlefields</span></button></div></section></aside>
-<main id="map"></main><script src="https://unpkg.com/leaflet/dist/leaflet.js"></script><script <script src="script.js?v=zoomfix1"></script></body></html>
+<main id="map"></main><script src="https://unpkg.com/leaflet/dist/leaflet.js"></script><script src="script.js?v=zoomfix1"></script></body></html>

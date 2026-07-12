@@ -10,6 +10,14 @@ const loh = L.tileLayer('basemap_tiles/{z}/{x}/{y}.png', {
     attribution: 'Landscapes of History'
 }).addTo(map);
 
+const satelliteBasemap = L.tileLayer(
+    "https://api.maptiler.com/tiles/satellite-v2/{z}/{x}/{y}.jpg?key=sHCKlBV643II0LBppv5O",
+    {
+        maxZoom: 20,
+        attribution: '&copy; MapTiler &copy; OpenStreetMap contributors'
+    }
+);
+
 const osm = L.tileLayer(
     'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
     {
@@ -20,14 +28,21 @@ const osm = L.tileLayer(
 
 document
     .querySelectorAll('input[name="mapStyle"]')
-    .forEach(x =>
-        x.addEventListener('change', function () {
+    .forEach(x => {
+        x.addEventListener("change", function () {
             map.removeLayer(loh);
             map.removeLayer(osm);
+            map.removeLayer(satelliteBasemap);
 
-            (this.value === 'osm' ? osm : loh).addTo(map);
-        })
-    );
+            if (this.value === "osm") {
+                osm.addTo(map);
+            } else if (this.value === "satellite") {
+                satelliteBasemap.addTo(map);
+            } else {
+                loh.addTo(map);
+            }
+        });
+    });
 
 const mkIcon = url =>
     L.icon({
@@ -195,9 +210,11 @@ document
 const input = $('searchInput');
 const results = $('searchResults');
 const summary = $('searchSummary');
+const tabs = $('searchTabs');
 
 function clear() {
     results.innerHTML = '';
+    tabs.innerHTML = '';
     summary.textContent = '';
 }
 
@@ -262,11 +279,13 @@ function search() {
         `${matches.length === 1 ? '' : 's'} found for ` +
         `“${input.value.trim()}”`;
 
-    matches
+function renderResults(items) {
+    results.innerHTML = '';
+
+    items
         .sort((a, b) =>
             a.name.localeCompare(b.name)
         )
-
         .forEach(x => {
             const b = document.createElement('button');
 
@@ -306,6 +325,89 @@ function search() {
             results.appendChild(b);
         });
 }
+
+const projectKeys = [
+    ...new Set(matches.map(x => x.key))
+];
+
+if (projectKeys.length > 1) {
+    const allTab = document.createElement('button');
+
+    allTab.className = 'searchTab active';
+    allTab.textContent = 'All';
+
+    allTab.onclick = () => {
+        document
+            .querySelectorAll('.searchTab')
+            .forEach(t => t.classList.remove('active'));
+
+        allTab.classList.add('active');
+
+        renderResults(matches);
+    };
+
+    tabs.appendChild(allTab);
+
+    projectKeys.forEach(key => {
+        const tab = document.createElement('button');
+
+        tab.className = 'searchTab';
+        tab.textContent = projects[key].name;
+
+        tab.onclick = () => {
+            document
+                .querySelectorAll('.searchTab')
+                .forEach(t => t.classList.remove('active'));
+
+            tab.classList.add('active');
+
+            renderResults(
+                matches.filter(x => x.key === key)
+            );
+        };
+
+        tabs.appendChild(tab);
+    });
+}
+
+renderResults(matches);
+            const b = document.createElement('button');
+
+            b.className = 'searchResult';
+
+            const icon =
+                projects[x.key].icon.options.iconUrl;
+
+            const place =
+                x.locality ||
+                x.town ||
+                x.parish ||
+                x.county;
+
+            b.innerHTML = `
+                <img src="${icon}" alt="">
+                <span>
+                    <strong>${esc(x.name)}</strong>
+                    <small>
+                        ${esc(place)} · ${esc(x.project)}
+                    </small>
+                </span>
+            `;
+
+            b.onclick = () => {
+                map.flyTo(
+                    x.latlng,
+                    14,
+                    {
+                        duration: 0.8
+                    }
+                );
+
+                x.searchMarker.openPopup();
+            };
+
+            results.appendChild(b);
+        }
 
 $('searchButton').onclick = search;
 
