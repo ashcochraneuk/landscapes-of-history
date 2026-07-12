@@ -1,16 +1,329 @@
-const map=L.map('map',{minZoom:6,maxZoom:19}).setView([52.5,-1.5],6);
-const loh=L.tileLayer('basemap_tiles/{z}/{x}/{y}.png',{minZoom:6,maxNativeZoom:14,maxZoom:19,attribution:'Landscapes of History'}).addTo(map);
-const osm=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap contributors'});
-document.querySelectorAll('input[name="mapStyle"]').forEach(x=>x.addEventListener('change',function(){map.removeLayer(loh);map.removeLayer(osm);(this.value==='osm'?osm:loh).addTo(map)}));
-const mkIcon=url=>L.icon({iconUrl:url,iconSize:[18,18],iconAnchor:[9,9],popupAnchor:[0,-10]});
-const projects={martello:{name:'Martello Towers',file:'data/martellos.geojson',icon:mkIcon('icons/martellotowers.png')},water:{name:'Water Towers',file:'data/water_towers.geojson',icon:mkIcon('icons/watertower.png')},battlefield:{name:'Battlefields',file:'data/battlefields.geojson',icon:mkIcon('icons/Battlefields.png')}};
-const locations=[],$=id=>document.getElementById(id),txt=v=>(v??'').toString().trim(),norm=v=>txt(v).toLowerCase(),esc=v=>txt(v).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;');
-function popup(p){let h=`<h3>${esc(p.Name||'Unknown Site')}</h3>`;[['Town',p.Town],['Locality',p.Locality],['Parish',p.Parish],['County',p.County]].forEach(([k,v])=>{if(txt(v))h+=`<b>${k}:</b> ${esc(v)}<br>`});return h}
-function active(key,on){const p=projects[key],card=document.querySelector(`[data-project="${key}"]`);if(!p.layer)return;if(on&&!map.hasLayer(p.layer))p.layer.addTo(map);if(!on&&map.hasLayer(p.layer))map.removeLayer(p.layer);card.classList.toggle('active',on)}
-function load(key){const p=projects[key];return fetch(p.file).then(r=>{if(!r.ok)throw Error(`Could not load ${p.file}`);return r.json()}).then(data=>{p.layer=L.geoJSON(data,{pointToLayer:(f,ll)=>L.marker(ll,{icon:p.icon}),onEachFeature:(f,m)=>{const x=f.properties||{};m.bindPopup(popup(x));locations.push({key,project:p.name,marker:m,name:txt(x.Name),town:txt(x.Town),locality:txt(x.Locality),parish:txt(x.Parish),county:txt(x.County)})}})}).catch(console.error)}
-Promise.all(Object.keys(projects).map(load));
-document.querySelectorAll('.projectCard').forEach(card=>card.addEventListener('click',()=>{const k=card.dataset.project,p=projects[k];if(p.layer)active(k,!map.hasLayer(p.layer))}));
-const input=$('searchInput'),results=$('searchResults'),summary=$('searchSummary');
-function clear(){results.innerHTML='';summary.textContent=''}
-function search(){const q=norm(input.value);clear();if(!q)return;const matches=locations.filter(x=>norm(x.name).includes(q)||[x.town,x.locality,x.parish,x.county].some(v=>norm(v)===q));if(!matches.length){summary.textContent=`No locations found for “${input.value.trim()}”.`;return}new Set(matches.map(x=>x.key)).forEach(k=>active(k,true));map.fitBounds(L.latLngBounds(matches.map(x=>x.marker.getLatLng())),{padding:[45,45],maxZoom:14});summary.textContent=`${matches.length} location${matches.length===1?'':'s'} found for “${input.value.trim()}”`;matches.sort((a,b)=>a.name.localeCompare(b.name)).forEach(x=>{const b=document.createElement('button');b.className='searchResult';const icon=projects[x.key].icon.options.iconUrl,place=x.locality||x.town||x.parish||x.county;b.innerHTML=`<img src="${icon}" alt=""><span><strong>${esc(x.name)}</strong><small>${esc(place)} · ${esc(x.project)}</small></span>`;b.onclick=()=>{active(x.key,true);map.flyTo(x.marker.getLatLng(),14,{duration:.8});x.marker.openPopup()};results.appendChild(b)})}
-$('searchButton').onclick=search;input.addEventListener('keydown',e=>{if(e.key==='Enter')search()});input.addEventListener('input',()=>{if(!input.value.trim())clear()});
+const map = L.map('map', {
+    minZoom: 6,
+    maxZoom: 14
+}).setView([52.5, -1.5], 6);
+
+const loh = L.tileLayer('basemap_tiles/{z}/{x}/{y}.png', {
+    minZoom: 6,
+    maxNativeZoom: 14,
+    maxZoom: 14,
+    attribution: 'Landscapes of History'
+}).addTo(map);
+
+const osm = L.tileLayer(
+    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap contributors'
+    }
+);
+
+document
+    .querySelectorAll('input[name="mapStyle"]')
+    .forEach(x =>
+        x.addEventListener('change', function () {
+            map.removeLayer(loh);
+            map.removeLayer(osm);
+
+            (this.value === 'osm' ? osm : loh).addTo(map);
+        })
+    );
+
+const mkIcon = url =>
+    L.icon({
+        iconUrl: url,
+        iconSize: [18, 18],
+        iconAnchor: [9, 9],
+        popupAnchor: [0, -10]
+    });
+
+const projects = {
+    martello: {
+        name: 'Martello Towers',
+        file: 'data/martellos.geojson',
+        icon: mkIcon('icons/martellotowers.png')
+    },
+
+    water: {
+        name: 'Water Towers',
+        file: 'data/water_towers.geojson',
+        icon: mkIcon('icons/watertower.png')
+    },
+
+    battlefield: {
+        name: 'Battlefields',
+        file: 'data/battlefields.geojson',
+        icon: mkIcon('icons/Battlefields.png')
+    }
+};
+
+const locations = [];
+
+const searchLayer = L.layerGroup();
+
+const $ = id => document.getElementById(id);
+
+const txt = v => (v ?? '').toString().trim();
+
+const norm = v => txt(v).toLowerCase();
+
+const esc = v =>
+    txt(v)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+
+function popup(p) {
+    let h = `<h3>${esc(p.Name || 'Unknown Site')}</h3>`;
+
+    [
+        ['Town', p.Town],
+        ['Locality', p.Locality],
+        ['Parish', p.Parish],
+        ['County', p.County]
+    ].forEach(([k, v]) => {
+        if (txt(v)) {
+            h += `<b>${k}:</b> ${esc(v)}<br>`;
+        }
+    });
+
+    return h;
+}
+
+function active(key, on) {
+    const p = projects[key];
+
+    const card = document.querySelector(
+        `[data-project="${key}"]`
+    );
+
+    if (!p.layer) return;
+
+    if (on && !map.hasLayer(p.layer)) {
+        p.layer.addTo(map);
+    }
+
+    if (!on && map.hasLayer(p.layer)) {
+        map.removeLayer(p.layer);
+    }
+
+    card.classList.toggle('active', on);
+}
+
+function clearSearchMap() {
+    searchLayer.clearLayers();
+
+    if (map.hasLayer(searchLayer)) {
+        map.removeLayer(searchLayer);
+    }
+}
+
+function clearProjects() {
+    Object.keys(projects).forEach(key => {
+        active(key, false);
+    });
+}
+
+function load(key) {
+    const p = projects[key];
+
+    return fetch(p.file)
+        .then(r => {
+            if (!r.ok) {
+                throw Error(`Could not load ${p.file}`);
+            }
+
+            return r.json();
+        })
+
+        .then(data => {
+            p.layer = L.geoJSON(data, {
+                pointToLayer: (f, ll) =>
+                    L.marker(ll, {
+                        icon: p.icon
+                    }),
+
+                onEachFeature: (f, marker) => {
+                    const x = f.properties || {};
+
+                    const popupHTML = popup(x);
+
+                    marker.bindPopup(popupHTML);
+
+                    locations.push({
+                        key,
+                        project: p.name,
+                        name: txt(x.Name),
+                        town: txt(x.Town),
+                        locality: txt(x.Locality),
+                        parish: txt(x.Parish),
+                        county: txt(x.County),
+                        latlng: marker.getLatLng(),
+                        popupHTML
+                    });
+                }
+            });
+        })
+
+        .catch(console.error);
+}
+
+Promise.all(
+    Object.keys(projects).map(load)
+);
+
+document
+    .querySelectorAll('.projectCard')
+    .forEach(card =>
+        card.addEventListener('click', () => {
+            const key = card.dataset.project;
+            const p = projects[key];
+
+            clearSearchMap();
+
+            if (p.layer) {
+                active(
+                    key,
+                    !map.hasLayer(p.layer)
+                );
+            }
+        })
+    );
+
+const input = $('searchInput');
+const results = $('searchResults');
+const summary = $('searchSummary');
+
+function clear() {
+    results.innerHTML = '';
+    summary.textContent = '';
+}
+
+function search() {
+    const q = norm(input.value);
+
+    clear();
+
+    if (!q) return;
+
+    const matches = locations.filter(x =>
+        norm(x.name).includes(q) ||
+        [
+            x.town,
+            x.locality,
+            x.parish,
+            x.county
+        ].some(v => norm(v) === q)
+    );
+
+    if (!matches.length) {
+        clearSearchMap();
+
+        summary.textContent =
+            `No locations found for “${input.value.trim()}”.`;
+
+        return;
+    }
+
+    clearProjects();
+    clearSearchMap();
+
+    matches.forEach(x => {
+        const marker = L.marker(
+            x.latlng,
+            {
+                icon: projects[x.key].icon
+            }
+        );
+
+        marker.bindPopup(x.popupHTML);
+
+        marker.addTo(searchLayer);
+
+        x.searchMarker = marker;
+    });
+
+    searchLayer.addTo(map);
+
+    map.fitBounds(
+        L.latLngBounds(
+            matches.map(x => x.latlng)
+        ),
+        {
+            padding: [45, 45],
+            maxZoom: 14
+        }
+    );
+
+    summary.textContent =
+        `${matches.length} location` +
+        `${matches.length === 1 ? '' : 's'} found for ` +
+        `“${input.value.trim()}”`;
+
+    matches
+        .sort((a, b) =>
+            a.name.localeCompare(b.name)
+        )
+
+        .forEach(x => {
+            const b = document.createElement('button');
+
+            b.className = 'searchResult';
+
+            const icon =
+                projects[x.key].icon.options.iconUrl;
+
+            const place =
+                x.locality ||
+                x.town ||
+                x.parish ||
+                x.county;
+
+            b.innerHTML = `
+                <img src="${icon}" alt="">
+                <span>
+                    <strong>${esc(x.name)}</strong>
+                    <small>
+                        ${esc(place)} · ${esc(x.project)}
+                    </small>
+                </span>
+            `;
+
+            b.onclick = () => {
+                map.flyTo(
+                    x.latlng,
+                    14,
+                    {
+                        duration: 0.8
+                    }
+                );
+
+                x.searchMarker.openPopup();
+            };
+
+            results.appendChild(b);
+        });
+}
+
+$('searchButton').onclick = search;
+
+input.addEventListener(
+    'keydown',
+    e => {
+        if (e.key === 'Enter') {
+            search();
+        }
+    }
+);
+
+input.addEventListener(
+    'input',
+    () => {
+        if (!input.value.trim()) {
+            clear();
+            clearSearchMap();
+        }
+    }
+);
