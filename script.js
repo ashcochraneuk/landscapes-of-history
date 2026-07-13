@@ -4,7 +4,7 @@ const map = L.map('map', {
 }).setView([52.5, -1.5], 6);
 
 const loh = L.tileLayer(
-    ''https://pub-149594e32a1c4ec4905b3d4a1b7566d0.r2.dev/{z}/{x}/{y}.png'',
+    'https://pub-149594e32a1c4ec4905b3d4a1b7566d0.r2.dev/{z}/{x}/{y}.png',
     {
         minZoom: 6,
         maxNativeZoom: 14,
@@ -32,14 +32,14 @@ const osm = L.tileLayer(
 document
     .querySelectorAll('input[name="mapStyle"]')
     .forEach(x => {
-        x.addEventListener("change", function () {
+        x.addEventListener('change', function () {
             map.removeLayer(loh);
             map.removeLayer(osm);
             map.removeLayer(satelliteBasemap);
 
-            if (this.value === "osm") {
+            if (this.value === 'osm') {
                 osm.addTo(map);
-            } else if (this.value === "satellite") {
+            } else if (this.value === 'satellite') {
                 satelliteBasemap.addTo(map);
             } else {
                 loh.addTo(map);
@@ -155,7 +155,6 @@ function load(key) {
 
             return r.json();
         })
-
         .then(data => {
             p.layer = L.geoJSON(data, {
                 pointToLayer: (f, ll) =>
@@ -184,7 +183,6 @@ function load(key) {
                 }
             });
         })
-
         .catch(console.error);
 }
 
@@ -282,135 +280,99 @@ function search() {
         `${matches.length === 1 ? '' : 's'} found for ` +
         `“${input.value.trim()}”`;
 
-function renderResults(items) {
-    results.innerHTML = '';
+    function renderResults(items) {
+        results.innerHTML = '';
 
-    items
-        .sort((a, b) =>
-            a.name.localeCompare(b.name)
-        )
-        .forEach(x => {
-            const b = document.createElement('button');
+        [...items]
+            .sort((a, b) =>
+                a.name.localeCompare(b.name)
+            )
+            .forEach(x => {
+                const b = document.createElement('button');
 
-            b.className = 'searchResult';
+                b.className = 'searchResult';
 
-            const icon =
-                projects[x.key].icon.options.iconUrl;
+                const icon =
+                    projects[x.key].icon.options.iconUrl;
 
-            const place =
-                x.locality ||
-                x.town ||
-                x.parish ||
-                x.county;
+                const place =
+                    x.locality ||
+                    x.town ||
+                    x.parish ||
+                    x.county;
 
-            b.innerHTML = `
-                <img src="${icon}" alt="">
-                <span>
-                    <strong>${esc(x.name)}</strong>
-                    <small>
-                        ${esc(place)} · ${esc(x.project)}
-                    </small>
-                </span>
-            `;
+                b.innerHTML = `
+                    <img src="${icon}" alt="">
+                    <span>
+                        <strong>${esc(x.name)}</strong>
+                        <small>
+                            ${esc(place)} · ${esc(x.project)}
+                        </small>
+                    </span>
+                `;
 
-            b.onclick = () => {
-                map.flyTo(
-                    x.latlng,
-                    14,
-                    {
-                        duration: 0.8
-                    }
-                );
+                b.onclick = () => {
+                    map.flyTo(
+                        x.latlng,
+                        14,
+                        {
+                            duration: 0.8
+                        }
+                    );
 
-                x.searchMarker.openPopup();
-            };
+                    x.searchMarker.openPopup();
+                };
 
-            results.appendChild(b);
-        });
-}
+                results.appendChild(b);
+            });
+    }
 
-const projectKeys = [
-    ...new Set(matches.map(x => x.key))
-];
+    const projectKeys = [
+        ...new Set(matches.map(x => x.key))
+    ];
 
-if (projectKeys.length > 1) {
-    const allTab = document.createElement('button');
+    if (projectKeys.length > 1) {
+        const allTab = document.createElement('button');
 
-    allTab.className = 'searchTab active';
-    allTab.textContent = 'All';
+        allTab.className = 'searchTab active';
+        allTab.textContent = 'All';
 
-    allTab.onclick = () => {
-        document
-            .querySelectorAll('.searchTab')
-            .forEach(t => t.classList.remove('active'));
-
-        allTab.classList.add('active');
-
-        renderResults(matches);
-    };
-
-    tabs.appendChild(allTab);
-
-    projectKeys.forEach(key => {
-        const tab = document.createElement('button');
-
-        tab.className = 'searchTab';
-        tab.textContent = projects[key].name;
-
-        tab.onclick = () => {
+        allTab.onclick = () => {
             document
                 .querySelectorAll('.searchTab')
                 .forEach(t => t.classList.remove('active'));
 
-            tab.classList.add('active');
+            allTab.classList.add('active');
 
-            renderResults(
-                matches.filter(x => x.key === key)
-            );
+            renderResults(matches);
         };
 
-        tabs.appendChild(tab);
-    });
-}
+        tabs.appendChild(allTab);
 
-renderResults(matches);
-            const b = document.createElement('button');
+        projectKeys.forEach(key => {
+            const tab = document.createElement('button');
 
-            b.className = 'searchResult';
+            tab.className = 'searchTab';
+            tab.textContent = projects[key].name;
 
-            const icon =
-                projects[x.key].icon.options.iconUrl;
+            tab.onclick = () => {
+                document
+                    .querySelectorAll('.searchTab')
+                    .forEach(t => t.classList.remove('active'));
 
-            const place =
-                x.locality ||
-                x.town ||
-                x.parish ||
-                x.county;
+                tab.classList.add('active');
 
-            b.innerHTML = `
-                <img src="${icon}" alt="">
-                <span>
-                    <strong>${esc(x.name)}</strong>
-                    <small>
-                        ${esc(place)} · ${esc(x.project)}
-                    </small>
-                </span>
-            `;
-
-            b.onclick = () => {
-                map.flyTo(
-                    x.latlng,
-                    14,
-                    {
-                        duration: 0.8
-                    }
+                renderResults(
+                    matches.filter(x => x.key === key)
                 );
-
-                x.searchMarker.openPopup();
             };
 
-            results.appendChild(b);
-        }
+            tabs.appendChild(tab);
+        });
+    }
+
+    renderResults(matches);
+}
 
 $('searchButton').onclick = search;
 
