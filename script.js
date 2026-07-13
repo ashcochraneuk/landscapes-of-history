@@ -4,7 +4,7 @@ const map = L.map('map', {
 }).setView([52.5, -1.5], 6);
 
 const loh = L.tileLayer(
-    'https://pub-149594e32a1c4ec4905b3d4a1b7566d0.r2.dev/{z}/{x}/{y}.png',
+    `https://pub-149594e32a1c4ec4905b3d4a1b7566d0.r2.dev/{z}/{x}/{y}.png`,
     {
         minZoom: 6,
         maxNativeZoom: 14,
