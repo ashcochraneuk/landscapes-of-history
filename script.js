@@ -3,12 +3,15 @@ const map = L.map('map', {
     maxZoom: 14
 }).setView([52.5, -1.5], 6);
 
-const loh = L.tileLayer('basemap_tiles/{z}/{x}/{y}.png', {
-    minZoom: 6,
-    maxNativeZoom: 14,
-    maxZoom: 14,
-    attribution: 'Landscapes of History'
-}).addTo(map);
+const loh = L.tileLayer(
+    'https://tiles.landscapesofhistory.co.uk/{z}/{x}/{y}.png',
+    {
+        minZoom: 6,
+        maxNativeZoom: 14,
+        maxZoom: 14,
+        attribution: 'Landscapes of History'
+    }
+).addTo(map);
 
 const satelliteBasemap = L.tileLayer(
     "https://api.maptiler.com/tiles/satellite-v2/{z}/{x}/{y}.jpg?key=sHCKlBV643II0LBppv5O",
