@@ -29,18 +29,3 @@ Promise.all([
     load('lighthouse'),
     load('geoglyph')
 ]);
-
-// The original desktop script handles .projectCard controls.
-// Wire the mobile cards to the same layer behaviour.
-document.querySelectorAll('.mobileProjectCard').forEach(card => {
-    card.addEventListener('click', () => {
-        const key = card.dataset.project;
-        const project = projects[key];
-
-        clearSearchMap();
-
-        if (project && project.layer) {
-            active(key, !map.hasLayer(project.layer));
-        }
-    });
-});
