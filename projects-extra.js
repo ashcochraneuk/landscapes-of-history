@@ -1,14 +1,14 @@
 // Additional Landscapes of History projects
 projects.lighthouse = {
     name: 'Lighthouses',
-    file: 'data/lighthouses_wgs84.geojson',
-    icon: mkIcon('icons/Lighthouses(1).png')
+    file: 'data/lighthouses.geojson',
+    icon: mkIcon('icons/lighthouses.png')
 };
 
 projects.geoglyph = {
     name: 'Geoglyphs',
-    file: 'data/geoglyphs_wgs84.geojson',
-    icon: mkIcon('icons/Geoglyphs(1).png')
+    file: 'data/geoglyphs.geojson',
+    icon: mkIcon('icons/geoglyphs.png')
 };
 
 // Keep matching desktop and mobile controls visually in sync.
