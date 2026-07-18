@@ -57,21 +57,21 @@ const mkIcon = url =>
 
 const projects = {
     martello: {
-    name: 'Martello Towers',
-    file: 'data/Martello Towers.geojson',
-    icon: mkIcon('icons/martellotowers.png')
-},
+        name: 'Martello Towers',
+        file: 'data/martello-towers.geojson',
+        icon: mkIcon('icons/martello-towers.png')
+    },
 
-water: {
-    name: 'Water Towers',
-    file: 'data/Water Towers.geojson',
-    icon: mkIcon('icons/watertower.png')
-},
+    water: {
+        name: 'Water Towers',
+        file: 'data/water-towers.geojson',
+        icon: mkIcon('icons/water-towers.png')
+    },
 
     battlefield: {
         name: 'Battlefields',
         file: 'data/battlefields.geojson',
-        icon: mkIcon('icons/Battlefields.png')
+        icon: mkIcon('icons/battlefields.png')
     }
 };
 
