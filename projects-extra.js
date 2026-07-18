@@ -2,13 +2,13 @@
 projects.lighthouse = {
     name: 'Lighthouses',
     file: 'data/lighthouses_wgs84.geojson',
-    icon: mkIcon('icons/Lighthouses.png')
+    icon: mkIcon('icons/Lighthouses(1).png')
 };
 
 projects.geoglyph = {
     name: 'Geoglyphs',
     file: 'data/geoglyphs_wgs84.geojson',
-    icon: mkIcon('icons/Geoglyphs.png')
+    icon: mkIcon('icons/Geoglyphs(1).png')
 };
 
 // Keep matching desktop and mobile controls visually in sync.
