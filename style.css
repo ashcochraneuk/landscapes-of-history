@@ -17,3 +17,8 @@
 .leaflet-tile {
     outline: 1px solid transparent;
 }
+
+/* Temporary end-to-end GitHub workflow test */
+body, button, input, #sidebar, #tagline, #searchSummary, .searchResult, .searchResult small, #mapStyles label, .projectCard, .leaflet-popup-content {
+    color: blue !important;
+}
