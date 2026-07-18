@@ -13,9 +13,15 @@ function syncProjectControls(key,on){
  });
 }
 
+function resetSheetDrag(sheet){
+ sheet.classList.remove('dragging');
+ sheet.style.removeProperty('transform');
+}
+
 function openMobileSheet(name){
  if(!mobileIsActive())return;
  document.querySelectorAll('.mobileSheet').forEach(sheet=>{
+  resetSheetDrag(sheet);
   const open=sheet.dataset.sheet===name;
   sheet.classList.toggle('open',open);
   sheet.setAttribute('aria-hidden',String(!open));
@@ -26,7 +32,11 @@ function openMobileSheet(name){
 }
 
 function closeMobileSheets(){
- document.querySelectorAll('.mobileSheet').forEach(sheet=>{sheet.classList.remove('open');sheet.setAttribute('aria-hidden','true')});
+ document.querySelectorAll('.mobileSheet').forEach(sheet=>{
+  resetSheetDrag(sheet);
+  sheet.classList.remove('open');
+  sheet.setAttribute('aria-hidden','true');
+ });
  document.querySelectorAll('.mobileNavButton').forEach(button=>button.classList.remove('active'));
  mobileBackdrop.classList.remove('open');
  setTimeout(()=>map.invalidateSize(),250);
@@ -39,6 +49,60 @@ document.querySelectorAll('.mobileNavButton').forEach(button=>button.addEventLis
 document.querySelectorAll('.sheetClose').forEach(button=>button.addEventListener('click',closeMobileSheets));
 mobileBackdrop.addEventListener('click',closeMobileSheets);
 document.getElementById('mobileSearchOpen').addEventListener('click',()=>{openMobileSheet('search');setTimeout(()=>mobileSearchInput.focus(),300)});
+
+// Let every mobile bottom sheet follow a downward thumb drag from its handle.
+document.querySelectorAll('.mobileSheet').forEach(sheet=>{
+ const handle=sheet.querySelector('.sheetHandle');
+ if(!handle)return;
+
+ let startY=0;
+ let currentY=0;
+ let startTime=0;
+ let dragging=false;
+
+ const finishDrag=()=>{
+  if(!dragging)return;
+  dragging=false;
+
+  const distance=Math.max(0,currentY-startY);
+  const elapsed=Math.max(1,performance.now()-startTime);
+  const velocity=distance/elapsed;
+  const shouldClose=distance>110||velocity>.65;
+
+  sheet.classList.remove('dragging');
+
+  if(shouldClose){
+   sheet.style.transform=`translateY(${Math.max(distance,140)}px)`;
+   requestAnimationFrame(()=>{
+    closeMobileSheets();
+   });
+  }else{
+   sheet.style.removeProperty('transform');
+  }
+ };
+
+ handle.addEventListener('pointerdown',event=>{
+  if(!sheet.classList.contains('open'))return;
+  dragging=true;
+  startY=event.clientY;
+  currentY=startY;
+  startTime=performance.now();
+  sheet.classList.add('dragging');
+  handle.setPointerCapture(event.pointerId);
+  event.preventDefault();
+ });
+
+ handle.addEventListener('pointermove',event=>{
+  if(!dragging)return;
+  currentY=event.clientY;
+  const distance=Math.max(0,currentY-startY);
+  sheet.style.transform=`translateY(${distance}px)`;
+  event.preventDefault();
+ });
+
+ handle.addEventListener('pointerup',finishDrag);
+ handle.addEventListener('pointercancel',finishDrag);
+});
 
 document.querySelectorAll('.mobileProjectCard').forEach(card=>card.addEventListener('click',()=>{
  const key=card.dataset.project,p=projects[key];
