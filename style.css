@@ -17,3 +17,6 @@
 .leaflet-tile {
     outline: 1px solid transparent;
 }
+
+/* Match the empty Leaflet canvas to the white LoH basemap. */
+.leaflet-container { background: #fff; }
