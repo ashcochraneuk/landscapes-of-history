@@ -47,13 +47,63 @@ document
         });
     });
 
-const mkIcon = url =>
-    L.icon({
+// Keep project markers compact at national scale, then increase their
+// footprint as the user zooms in. The original PNG artwork is untouched.
+const iconSizeForZoom = zoom => {
+    if (zoom <= 6) return 14;
+    if (zoom <= 8) return 15;
+    if (zoom <= 10) return 17;
+    return 19;
+};
+
+const iconUrls = new Set();
+
+const mkIcon = url => {
+    iconUrls.add(url);
+
+    const size = iconSizeForZoom(map.getZoom());
+
+    return L.icon({
         iconUrl: url,
-        iconSize: [18, 18],
-        iconAnchor: [9, 9],
-        popupAnchor: [0, -10]
+        iconSize: [size, size],
+        iconAnchor: [size / 2, size / 2],
+        popupAnchor: [0, -(size / 2 + 1)]
     });
+};
+
+function resizeProjectMarkers() {
+    const size = iconSizeForZoom(map.getZoom());
+
+    Object.values(projects).forEach(project => {
+        if (!project.icon) return;
+
+        const url = project.icon.options.iconUrl;
+
+        project.icon = L.icon({
+            iconUrl: url,
+            iconSize: [size, size],
+            iconAnchor: [size / 2, size / 2],
+            popupAnchor: [0, -(size / 2 + 1)]
+        });
+
+        if (project.layer) {
+            project.layer.eachLayer(marker => {
+                if (marker.setIcon) marker.setIcon(project.icon);
+            });
+        }
+    });
+
+    searchLayer.eachLayer(marker => {
+        const url = marker.options.icon?.options?.iconUrl;
+        const project = Object.values(projects).find(
+            p => p.icon?.options?.iconUrl === url
+        );
+
+        if (project && marker.setIcon) marker.setIcon(project.icon);
+    });
+}
+
+map.on('zoomend', resizeProjectMarkers);
 
 const projects = {
     martello: {
